@@ -1,10 +1,18 @@
+from contextlib import asynccontextmanager
+from core.scheduler import start_scheduler, stop_scheduler
 from service.etf_service import ETFService
 from providers.marketpriceprovider import MarketPriceProvider
 from providers.inavpriceprovider import INavProvider
 from db.session import Base, Engine
 from fastapi import FastAPI
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+app = FastAPI(lifespan=lifespan)
 
 Base.metadata.create_all(bind=Engine)
 

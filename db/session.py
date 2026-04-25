@@ -1,11 +1,12 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, DeclarativeBase
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Create Engine
+# create Engine
 url = "sqlite:///./etf.db"
 Engine = create_engine(url=url)
 
-# Create Session
-SessionLocal = Session(bind=Engine, autocommit=False)
+# create Session
+SessionLocal = sessionmaker(bind=Engine, autocommit=False)
 
-Base = DeclarativeBase()
+# create Base
+Base = declarative_base()
