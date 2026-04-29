@@ -1,0 +1,6 @@
+fastapi
+sqlalchemy
+requests
+apscheduler
+yfinance
+uvicorn
