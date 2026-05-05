@@ -1,9 +1,9 @@
-from fastapi import APIRouter,Depends
-from db.models import ETFPriceTracker
+from fastapi import APIRouter, Depends, Query
 from db.session import SessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
-
+from repositories.etf_repository import ETFRepository
+from service.etf_service import ETFService
 
 router = APIRouter()
 
@@ -14,24 +14,21 @@ def get_db():
     finally:
         db.close()
 
-db = Annotated[Session, Depends(get_db)]
+DBSession = Annotated[Session, Depends(get_db)]
 
 
 @router.get("/latest")
-async def lastest(db:db):
-    return db.query(ETFPriceTracker)\
-        .order_by(ETFPriceTracker.datetime.desc())\
-        .limit(1)\
-        .all()
+async def latest(db:DBSession):
+    repo = ETFRepository(db)
+    service = ETFService(repo)
+    return service.get_latest()
 
 
 @router.get("/history")
-async def history(db: db, limit = 50):
-    return db.query(ETFPriceTracker)\
-        .order_by(ETFPriceTracker.datetime.desc())\
-        .limit(limit)\
-        .all()
-
+async def history(db: DBSession, limit: int = Query(50, le=100)):
+    repo = ETFRepository(db)
+    service = ETFService(repo)
+    return service.get_history(limit)
 
 
 
